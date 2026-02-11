@@ -1,0 +1,1160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AIS Studios — Music Production & Sound Engineering</title>
+  <meta name="description" content="Professional music production, vocal recording, mixing & mastering by Anoopinder Singh Shergill. Crafting original rhythms and engineering pristine sound.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=Space+Mono:ital,wght@0,400;0,700;1,400&family=Instrument+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    /* ═══════════════════════════════════════
+       RESET & VARIABLES
+       ═══════════════════════════════════════ */
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+    :root {
+      --black: #060606;
+      --dark: #0c0c0c;
+      --dark-surface: #111111;
+      --dark-elevated: #1a1a1a;
+      --dark-border: #222222;
+      --amber: #D4A24E;
+      --amber-glow: #D4A24E40;
+      --amber-bright: #E8B95A;
+      --amber-dim: #8B6914;
+      --teal: #4A9E8E;
+      --text: #E2DDD5;
+      --text-muted: #8A857D;
+      --text-dim: #555048;
+      --font-display: 'Syne', sans-serif;
+      --font-mono: 'Space Mono', monospace;
+      --font-body: 'Instrument Sans', sans-serif;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: var(--font-body);
+      background: var(--black);
+      color: var(--text);
+      overflow-x: hidden;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* Noise texture overlay */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+      pointer-events: none;
+      z-index: 9999;
+    }
+
+    ::selection {
+      background: var(--amber);
+      color: var(--black);
+    }
+
+    a { color: inherit; text-decoration: none; }
+
+    /* ═══════════════════════════════════════
+       ANIMATIONS
+       ═══════════════════════════════════════ */
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(30px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+
+    @keyframes slideRight {
+      from { transform: scaleX(0); }
+      to { transform: scaleX(1); }
+    }
+
+    @keyframes pulse-bar {
+      0%, 100% { transform: scaleY(0.3); }
+      50% { transform: scaleY(1); }
+    }
+
+    @keyframes pulse-glow {
+      0%, 100% { opacity: 0.3; }
+      50% { opacity: 0.7; }
+    }
+
+    @keyframes vu-sweep {
+      0% { transform: rotate(-45deg); }
+      50% { transform: rotate(30deg); }
+      100% { transform: rotate(-45deg); }
+    }
+
+    @keyframes waveform-draw {
+      from { stroke-dashoffset: 1200; }
+      to { stroke-dashoffset: 0; }
+    }
+
+    @keyframes float {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-8px); }
+    }
+
+    .reveal {
+      opacity: 0;
+      transform: translateY(30px);
+      transition: opacity 0.8s ease, transform 0.8s ease;
+    }
+
+    .reveal.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    /* ═══════════════════════════════════════
+       NAVIGATION
+       ═══════════════════════════════════════ */
+    nav {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 1000;
+      padding: 1.5rem 2rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: linear-gradient(to bottom, var(--black) 0%, transparent 100%);
+      transition: background 0.3s ease;
+    }
+
+    nav.scrolled {
+      background: rgba(6, 6, 6, 0.95);
+      backdrop-filter: blur(20px);
+      border-bottom: 1px solid var(--dark-border);
+    }
+
+    .nav-logo {
+      font-family: var(--font-display);
+      font-weight: 800;
+      font-size: 1.25rem;
+      letter-spacing: 0.1em;
+      color: var(--amber);
+    }
+
+    .nav-logo span {
+      color: var(--text);
+      font-weight: 400;
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 2.5rem;
+      list-style: none;
+    }
+
+    .nav-links a {
+      font-family: var(--font-mono);
+      font-size: 0.7rem;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      transition: color 0.3s ease;
+      position: relative;
+    }
+
+    .nav-links a::after {
+      content: '';
+      position: absolute;
+      bottom: -4px;
+      left: 0;
+      width: 100%;
+      height: 1px;
+      background: var(--amber);
+      transform: scaleX(0);
+      transform-origin: right;
+      transition: transform 0.3s ease;
+    }
+
+    .nav-links a:hover { color: var(--amber); }
+    .nav-links a:hover::after { transform: scaleX(1); transform-origin: left; }
+
+    .nav-mobile {
+      display: none;
+      flex-direction: column;
+      gap: 5px;
+      cursor: pointer;
+      padding: 4px;
+    }
+
+    .nav-mobile span {
+      display: block;
+      width: 24px;
+      height: 1.5px;
+      background: var(--text);
+      transition: all 0.3s ease;
+    }
+
+    /* ═══════════════════════════════════════
+       HERO
+       ═══════════════════════════════════════ */
+    .hero {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      position: relative;
+      padding: 2rem;
+      overflow: hidden;
+    }
+
+    /* Radial amber glow behind hero */
+    .hero::before {
+      content: '';
+      position: absolute;
+      top: 20%;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 800px;
+      height: 600px;
+      background: radial-gradient(ellipse, var(--amber-glow) 0%, transparent 70%);
+      filter: blur(80px);
+      pointer-events: none;
+      animation: pulse-glow 6s ease-in-out infinite;
+    }
+
+    /* Horizontal studio lines */
+    .hero-lines {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      opacity: 0.04;
+    }
+
+    .hero-lines::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: repeating-linear-gradient(
+        0deg,
+        transparent,
+        transparent 60px,
+        var(--text) 60px,
+        var(--text) 61px
+      );
+    }
+
+    /* Equalizer bars */
+    .eq-bars {
+      display: flex;
+      gap: 3px;
+      align-items: flex-end;
+      height: 80px;
+      margin-bottom: 3rem;
+      opacity: 0;
+      animation: fadeIn 1s ease 0.5s forwards;
+    }
+
+    .eq-bar {
+      width: 3px;
+      background: linear-gradient(to top, var(--amber-dim), var(--amber), var(--amber-bright));
+      border-radius: 2px;
+      animation: pulse-bar 1.2s ease-in-out infinite;
+    }
+
+    .hero-content {
+      text-align: center;
+      position: relative;
+      z-index: 2;
+    }
+
+    .hero-tag {
+      font-family: var(--font-mono);
+      font-size: 0.65rem;
+      letter-spacing: 0.35em;
+      text-transform: uppercase;
+      color: var(--amber);
+      margin-bottom: 1.5rem;
+      opacity: 0;
+      animation: fadeUp 0.8s ease 0.8s forwards;
+    }
+
+    .hero h1 {
+      font-family: var(--font-display);
+      font-size: clamp(3rem, 10vw, 8rem);
+      font-weight: 800;
+      line-height: 0.95;
+      letter-spacing: -0.03em;
+      margin-bottom: 1.5rem;
+      opacity: 0;
+      animation: fadeUp 0.8s ease 1s forwards;
+    }
+
+    .hero h1 em {
+      font-style: italic;
+      color: var(--amber);
+    }
+
+    .hero-sub {
+      font-family: var(--font-body);
+      font-size: 1.1rem;
+      color: var(--text-muted);
+      max-width: 480px;
+      margin: 0 auto 2.5rem;
+      line-height: 1.7;
+      opacity: 0;
+      animation: fadeUp 0.8s ease 1.2s forwards;
+    }
+
+    .hero-cta {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.75rem;
+      font-family: var(--font-mono);
+      font-size: 0.7rem;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--black);
+      background: var(--amber);
+      padding: 1rem 2.5rem;
+      border: none;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      opacity: 0;
+      animation: fadeUp 0.8s ease 1.4s forwards;
+    }
+
+    .hero-cta:hover {
+      background: var(--amber-bright);
+      box-shadow: 0 0 40px var(--amber-glow);
+      transform: translateY(-2px);
+    }
+
+    .hero-cta svg {
+      width: 14px;
+      height: 14px;
+      transition: transform 0.3s ease;
+    }
+
+    .hero-cta:hover svg { transform: translateX(4px); }
+
+    /* Scroll indicator */
+    .scroll-hint {
+      position: absolute;
+      bottom: 2.5rem;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.5rem;
+      opacity: 0;
+      animation: fadeIn 1s ease 2s forwards;
+    }
+
+    .scroll-hint span {
+      font-family: var(--font-mono);
+      font-size: 0.55rem;
+      letter-spacing: 0.3em;
+      text-transform: uppercase;
+      color: var(--text-dim);
+    }
+
+    .scroll-line {
+      width: 1px;
+      height: 40px;
+      background: linear-gradient(to bottom, var(--amber), transparent);
+      animation: pulse-glow 2s ease-in-out infinite;
+    }
+
+    /* ═══════════════════════════════════════
+       WAVEFORM DIVIDER
+       ═══════════════════════════════════════ */
+    .waveform-divider {
+      width: 100%;
+      height: 60px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .waveform-divider svg {
+      width: 100%;
+      height: 100%;
+    }
+
+    .waveform-divider path {
+      stroke: var(--amber-dim);
+      stroke-width: 1;
+      fill: none;
+      stroke-dasharray: 1200;
+      stroke-dashoffset: 1200;
+    }
+
+    .waveform-divider.visible path {
+      animation: waveform-draw 2s ease forwards;
+    }
+
+    /* ═══════════════════════════════════════
+       SECTION COMMON
+       ═══════════════════════════════════════ */
+    section {
+      padding: 6rem 2rem;
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    .section-label {
+      font-family: var(--font-mono);
+      font-size: 0.6rem;
+      letter-spacing: 0.4em;
+      text-transform: uppercase;
+      color: var(--amber);
+      margin-bottom: 1rem;
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .section-label::before {
+      content: '';
+      width: 30px;
+      height: 1px;
+      background: var(--amber);
+    }
+
+    .section-title {
+      font-family: var(--font-display);
+      font-size: clamp(2rem, 5vw, 3.5rem);
+      font-weight: 700;
+      line-height: 1.1;
+      letter-spacing: -0.02em;
+      margin-bottom: 1.5rem;
+    }
+
+    .section-desc {
+      font-size: 1rem;
+      color: var(--text-muted);
+      line-height: 1.8;
+      max-width: 600px;
+    }
+
+    /* ═══════════════════════════════════════
+       ABOUT
+       ═══════════════════════════════════════ */
+    .about {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 4rem;
+      align-items: center;
+    }
+
+    .about-visual {
+      position: relative;
+      height: 450px;
+      background: var(--dark-surface);
+      border: 1px solid var(--dark-border);
+      overflow: hidden;
+    }
+
+    /* VU Meter SVG */
+    .vu-meter {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .vu-meter svg {
+      width: 280px;
+      height: 280px;
+      opacity: 0.7;
+    }
+
+    .vu-needle {
+      transform-origin: 140px 200px;
+      animation: vu-sweep 3s ease-in-out infinite;
+    }
+
+    .about-visual::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(135deg, transparent 50%, rgba(212, 162, 78, 0.05) 100%);
+    }
+
+    /* Decorative corner marks */
+    .about-visual::before {
+      content: '';
+      position: absolute;
+      top: 12px;
+      left: 12px;
+      right: 12px;
+      bottom: 12px;
+      border: 1px solid var(--dark-border);
+      pointer-events: none;
+    }
+
+    .about-stats {
+      display: flex;
+      gap: 2rem;
+      margin-top: 2.5rem;
+      padding-top: 2rem;
+      border-top: 1px solid var(--dark-border);
+    }
+
+    .stat {
+      flex: 1;
+    }
+
+    .stat-number {
+      font-family: var(--font-display);
+      font-size: 2rem;
+      font-weight: 800;
+      color: var(--amber);
+    }
+
+    .stat-label {
+      font-family: var(--font-mono);
+      font-size: 0.6rem;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: var(--text-dim);
+      margin-top: 0.25rem;
+    }
+
+    /* ═══════════════════════════════════════
+       SERVICES
+       ═══════════════════════════════════════ */
+    .services-section {
+      background: var(--dark);
+      max-width: none;
+      padding: 6rem 2rem;
+    }
+
+    .services-inner {
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    .services-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 1px;
+      margin-top: 3rem;
+      background: var(--dark-border);
+      border: 1px solid var(--dark-border);
+    }
+
+    .service-card {
+      background: var(--dark-surface);
+      padding: 2.5rem 2rem;
+      position: relative;
+      overflow: hidden;
+      transition: all 0.4s ease;
+      cursor: default;
+    }
+
+    .service-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 2px;
+      background: var(--amber);
+      transform: scaleX(0);
+      transform-origin: left;
+      transition: transform 0.4s ease;
+    }
+
+    .service-card:hover {
+      background: var(--dark-elevated);
+    }
+
+    .service-card:hover::before {
+      transform: scaleX(1);
+    }
+
+    .service-icon {
+      width: 48px;
+      height: 48px;
+      margin-bottom: 1.5rem;
+      color: var(--amber);
+    }
+
+    .service-num {
+      font-family: var(--font-mono);
+      font-size: 0.55rem;
+      color: var(--text-dim);
+      letter-spacing: 0.1em;
+      margin-bottom: 1rem;
+    }
+
+    .service-card h3 {
+      font-family: var(--font-display);
+      font-size: 1.25rem;
+      font-weight: 700;
+      margin-bottom: 0.75rem;
+    }
+
+    .service-card p {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      line-height: 1.7;
+    }
+
+    /* ═══════════════════════════════════════
+       PROCESS
+       ═══════════════════════════════════════ */
+    .process-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 0;
+      margin-top: 3rem;
+      position: relative;
+    }
+
+    /* Vertical timeline line */
+    .process-grid::before {
+      content: '';
+      position: absolute;
+      left: 24px;
+      top: 0;
+      bottom: 0;
+      width: 1px;
+      background: linear-gradient(to bottom, var(--amber), var(--dark-border));
+    }
+
+    .process-step {
+      display: flex;
+      gap: 2.5rem;
+      padding: 2rem 0;
+      position: relative;
+    }
+
+    .process-marker {
+      width: 49px;
+      height: 49px;
+      min-width: 49px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: var(--font-mono);
+      font-size: 0.7rem;
+      font-weight: 700;
+      color: var(--amber);
+      background: var(--black);
+      border: 1px solid var(--amber-dim);
+      position: relative;
+      z-index: 2;
+      transition: all 0.3s ease;
+    }
+
+    .process-step:hover .process-marker {
+      background: var(--amber);
+      color: var(--black);
+      box-shadow: 0 0 30px var(--amber-glow);
+    }
+
+    .process-step h3 {
+      font-family: var(--font-display);
+      font-size: 1.3rem;
+      font-weight: 700;
+      margin-bottom: 0.5rem;
+    }
+
+    .process-step p {
+      font-size: 0.9rem;
+      color: var(--text-muted);
+      line-height: 1.7;
+      max-width: 500px;
+    }
+
+    /* ═══════════════════════════════════════
+       CONTACT / CTA
+       ═══════════════════════════════════════ */
+    .cta-section {
+      text-align: center;
+      padding: 8rem 2rem;
+      position: relative;
+      max-width: none;
+      overflow: hidden;
+    }
+
+    .cta-section::before {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 600px;
+      height: 400px;
+      background: radial-gradient(ellipse, var(--amber-glow) 0%, transparent 70%);
+      filter: blur(100px);
+      pointer-events: none;
+    }
+
+    .cta-inner {
+      position: relative;
+      z-index: 2;
+      max-width: 700px;
+      margin: 0 auto;
+    }
+
+    .cta-section .section-label {
+      justify-content: center;
+    }
+
+    .cta-section .section-label::before { display: none; }
+
+    .cta-section .section-title {
+      font-size: clamp(2.5rem, 6vw, 4.5rem);
+      margin-bottom: 1.5rem;
+    }
+
+    .cta-desc {
+      font-size: 1.05rem;
+      color: var(--text-muted);
+      line-height: 1.8;
+      margin-bottom: 3rem;
+    }
+
+    .cta-buttons {
+      display: flex;
+      gap: 1rem;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+
+    .btn-primary {
+      font-family: var(--font-mono);
+      font-size: 0.7rem;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--black);
+      background: var(--amber);
+      padding: 1.1rem 3rem;
+      border: none;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .btn-primary:hover {
+      background: var(--amber-bright);
+      box-shadow: 0 0 50px var(--amber-glow);
+      transform: translateY(-2px);
+    }
+
+    .btn-secondary {
+      font-family: var(--font-mono);
+      font-size: 0.7rem;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--text);
+      background: transparent;
+      padding: 1.1rem 3rem;
+      border: 1px solid var(--dark-border);
+      cursor: pointer;
+      transition: all 0.3s ease;
+      text-decoration: none;
+    }
+
+    .btn-secondary:hover {
+      border-color: var(--text-muted);
+      background: var(--dark-elevated);
+    }
+
+    .cta-email {
+      margin-top: 2rem;
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      color: var(--text-dim);
+      letter-spacing: 0.05em;
+    }
+
+    .cta-email a {
+      color: var(--amber);
+      transition: color 0.3s ease;
+    }
+
+    .cta-email a:hover { color: var(--amber-bright); }
+
+    /* ═══════════════════════════════════════
+       FOOTER
+       ═══════════════════════════════════════ */
+    footer {
+      border-top: 1px solid var(--dark-border);
+      padding: 2rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    .footer-left {
+      font-family: var(--font-mono);
+      font-size: 0.6rem;
+      color: var(--text-dim);
+      letter-spacing: 0.1em;
+    }
+
+    .footer-right {
+      display: flex;
+      gap: 1.5rem;
+    }
+
+    .footer-right a {
+      color: var(--text-dim);
+      font-family: var(--font-mono);
+      font-size: 0.6rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      transition: color 0.3s ease;
+    }
+
+    .footer-right a:hover { color: var(--amber); }
+
+    /* ═══════════════════════════════════════
+       RESPONSIVE
+       ═══════════════════════════════════════ */
+    @media (max-width: 900px) {
+      .services-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+
+      .about {
+        grid-template-columns: 1fr;
+        gap: 2rem;
+      }
+
+      .about-visual {
+        height: 300px;
+      }
+
+      .nav-links { display: none; }
+      .nav-mobile { display: flex; }
+    }
+
+    @media (max-width: 600px) {
+      .services-grid {
+        grid-template-columns: 1fr;
+      }
+
+      section { padding: 4rem 1.5rem; }
+
+      .hero { padding: 1.5rem; }
+
+      .about-stats {
+        flex-direction: column;
+        gap: 1.5rem;
+      }
+
+      .process-grid::before { left: 16px; }
+      .process-marker { width: 33px; height: 33px; min-width: 33px; font-size: 0.6rem; }
+      .process-step { gap: 1.5rem; }
+
+      .cta-buttons { flex-direction: column; align-items: center; }
+      .btn-primary, .btn-secondary { width: 100%; justify-content: center; }
+
+      footer { flex-direction: column; gap: 1rem; text-align: center; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ═══ NAVIGATION ═══ -->
+  <nav id="nav">
+    <a href="#" class="nav-logo">AIS <span>STUDIOS</span></a>
+    <ul class="nav-links">
+      <li><a href="#about">About</a></li>
+      <li><a href="#services">Services</a></li>
+      <li><a href="#process">Process</a></li>
+      <li><a href="#contact">Contact</a></li>
+    </ul>
+    <div class="nav-mobile" onclick="document.querySelector('.nav-links').classList.toggle('show')">
+      <span></span><span></span><span></span>
+    </div>
+  </nav>
+
+  <!-- ═══ HERO ═══ -->
+  <section class="hero">
+    <div class="hero-lines"></div>
+
+    <div class="hero-content">
+      <!-- Equalizer bars -->
+      <div class="eq-bars" id="eqBars"></div>
+
+      <p class="hero-tag">Music Production &middot; Sound Engineering</p>
+      <h1>Crafting<br><em>Sound</em></h1>
+      <p class="hero-sub">
+        Original rhythms. Pristine engineering. Every track shaped with intention
+        by Anoopinder Singh Shergill.
+      </p>
+      <a href="#contact" class="hero-cta">
+        Book a Session
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+      </a>
+    </div>
+
+    <div class="scroll-hint">
+      <span>Scroll</span>
+      <div class="scroll-line"></div>
+    </div>
+  </section>
+
+  <!-- Waveform divider -->
+  <div class="waveform-divider reveal">
+    <svg viewBox="0 0 1200 60" preserveAspectRatio="none">
+      <path d="M0,30 Q50,10 100,30 Q150,50 200,30 Q250,5 300,30 Q350,55 400,30 Q450,12 500,30 Q550,48 600,30 Q650,8 700,30 Q750,52 800,30 Q850,15 900,30 Q950,45 1000,30 Q1050,10 1100,30 Q1150,50 1200,30" />
+    </svg>
+  </div>
+
+  <!-- ═══ ABOUT ═══ -->
+  <section id="about">
+    <div class="about">
+      <div class="about-visual reveal">
+        <div class="vu-meter">
+          <svg viewBox="0 0 280 280">
+            <!-- VU meter face -->
+            <circle cx="140" cy="140" r="130" fill="none" stroke="#222" stroke-width="1"/>
+            <circle cx="140" cy="140" r="100" fill="none" stroke="#1a1a1a" stroke-width="0.5"/>
+            <!-- Scale markings -->
+            <path d="M60,120 A90,90 0 0,1 220,120" fill="none" stroke="#333" stroke-width="0.5"/>
+            <!-- Colored zone -->
+            <path d="M180,88 A70,70 0 0,1 230,140" fill="none" stroke="#8B2500" stroke-width="3" opacity="0.4"/>
+            <path d="M50,140 A70,70 0 0,1 180,88" fill="none" stroke="#D4A24E" stroke-width="3" opacity="0.3"/>
+            <!-- Needle -->
+            <line x1="140" y1="200" x2="140" y2="70" stroke="var(--amber)" stroke-width="1.5" class="vu-needle" stroke-linecap="round"/>
+            <circle cx="140" cy="200" r="6" fill="var(--dark-elevated)" stroke="var(--amber-dim)" stroke-width="1"/>
+            <!-- Label -->
+            <text x="140" y="240" text-anchor="middle" fill="#555048" font-family="var(--font-mono)" font-size="8" letter-spacing="3">VU</text>
+          </svg>
+        </div>
+      </div>
+
+      <div class="reveal">
+        <div class="section-label">About</div>
+        <h2 class="section-title">The ear behind<br>the sound</h2>
+        <p class="section-desc">
+          Anoopinder Singh Shergill is a music programmer, sound engineer, and songwriter
+          driven by a deep passion for sonic craft. With years behind the console and the
+          keyboard, he brings a rare blend of technical precision and creative instinct
+          to every project.
+        </p>
+        <p class="section-desc" style="margin-top: 1rem;">
+          From writing original compositions to engineering radio-ready mixes, AIS Studios
+          is where raw ideas become polished sound.
+        </p>
+
+        <div class="about-stats">
+          <div class="stat">
+            <div class="stat-number">100+</div>
+            <div class="stat-label">Tracks Produced</div>
+          </div>
+          <div class="stat">
+            <div class="stat-number">50+</div>
+            <div class="stat-label">Artists Served</div>
+          </div>
+          <div class="stat">
+            <div class="stat-number">10+</div>
+            <div class="stat-label">Years Experience</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══ SERVICES ═══ -->
+  <section class="services-section" id="services">
+    <div class="services-inner">
+      <div class="reveal">
+        <div class="section-label">Services</div>
+        <h2 class="section-title">What we do</h2>
+        <p class="section-desc">End-to-end music production services, from the first note to the final master.</p>
+      </div>
+
+      <div class="services-grid reveal">
+        <!-- Vocal Recording -->
+        <div class="service-card">
+          <svg class="service-icon" viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="17" y="4" width="14" height="24" rx="7"/>
+            <path d="M10 24a14 14 0 0 0 28 0"/>
+            <line x1="24" y1="38" x2="24" y2="44"/>
+            <line x1="16" y1="44" x2="32" y2="44"/>
+          </svg>
+          <div class="service-num">01</div>
+          <h3>Vocal Recording</h3>
+          <p>Professional vocal capture in a treated, acoustically optimized environment. We bring out the best in every voice.</p>
+        </div>
+
+        <!-- Mixing -->
+        <div class="service-card">
+          <svg class="service-icon" viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="8" y1="8" x2="8" y2="40"/><circle cx="8" cy="16" r="3"/>
+            <line x1="20" y1="8" x2="20" y2="40"/><circle cx="20" cy="28" r="3"/>
+            <line x1="32" y1="8" x2="32" y2="40"/><circle cx="32" cy="20" r="3"/>
+            <line x1="44" y1="8" x2="44" y2="40"/><circle cx="44" cy="32" r="3"/>
+          </svg>
+          <div class="service-num">02</div>
+          <h3>Mixing</h3>
+          <p>Balancing every element with surgical precision. Depth, clarity, and punch that translates across all playback systems.</p>
+        </div>
+
+        <!-- Mastering -->
+        <div class="service-card">
+          <svg class="service-icon" viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="24" cy="24" r="20"/>
+            <circle cx="24" cy="24" r="12"/>
+            <circle cx="24" cy="24" r="4"/>
+            <line x1="24" y1="4" x2="24" y2="12"/>
+            <line x1="24" y1="36" x2="24" y2="44"/>
+          </svg>
+          <div class="service-num">03</div>
+          <h3>Mastering</h3>
+          <p>The final polish. Loudness, dynamics, and tonal balance optimized for streaming, vinyl, or any distribution format.</p>
+        </div>
+
+        <!-- Music Production -->
+        <div class="service-card">
+          <svg class="service-icon" viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="4" y="14" width="40" height="24" rx="2"/>
+            <rect x="8" y="20" width="6" height="12" rx="1"/>
+            <rect x="16" y="18" width="6" height="14" rx="1"/>
+            <rect x="24" y="20" width="6" height="12" rx="1"/>
+            <rect x="32" y="16" width="6" height="16" rx="1"/>
+            <circle cx="24" cy="8" r="3"/>
+            <line x1="24" y1="11" x2="24" y2="14"/>
+          </svg>
+          <div class="service-num">04</div>
+          <h3>Music Production</h3>
+          <p>Full-scale production from composition to arrangement. Original beats, melodies, and soundscapes tailored to your vision.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Waveform divider -->
+  <div class="waveform-divider reveal">
+    <svg viewBox="0 0 1200 60" preserveAspectRatio="none">
+      <path d="M0,30 Q30,5 60,30 Q90,55 120,30 Q150,10 180,30 Q210,50 240,30 Q270,8 300,30 Q330,52 360,30 Q390,15 420,30 Q450,45 480,30 Q510,12 540,30 Q570,48 600,30 Q630,5 660,30 Q690,55 720,30 Q750,10 780,30 Q810,50 840,30 Q870,8 900,30 Q930,52 960,30 Q990,15 1020,30 Q1050,45 1080,30 Q1110,10 1140,30 Q1170,50 1200,30" />
+    </svg>
+  </div>
+
+  <!-- ═══ PROCESS ═══ -->
+  <section id="process">
+    <div class="reveal">
+      <div class="section-label">Process</div>
+      <h2 class="section-title">How it works</h2>
+      <p class="section-desc">A streamlined workflow built around your creative vision.</p>
+    </div>
+
+    <div class="process-grid">
+      <div class="process-step reveal">
+        <div class="process-marker">01</div>
+        <div>
+          <h3>Consultation</h3>
+          <p>We start with a conversation. Share your references, your vision, and what you want the music to feel like. No jargon, just honest dialogue about your sound.</p>
+        </div>
+      </div>
+
+      <div class="process-step reveal">
+        <div class="process-marker">02</div>
+        <div>
+          <h3>Pre-Production</h3>
+          <p>Song structure, arrangement, and sonic direction get mapped out. If you need beats or instrumentation, this is where the programming begins.</p>
+        </div>
+      </div>
+
+      <div class="process-step reveal">
+        <div class="process-marker">03</div>
+        <div>
+          <h3>Recording & Production</h3>
+          <p>The studio doors open. Vocals are tracked, instruments are layered, and the raw elements of your track come to life in a focused, creative environment.</p>
+        </div>
+      </div>
+
+      <div class="process-step reveal">
+        <div class="process-marker">04</div>
+        <div>
+          <h3>Mix & Master</h3>
+          <p>Every frequency finds its place. The mix is sculpted for impact and the master is tuned for distribution. You receive files ready for release.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══ CONTACT / CTA ═══ -->
+  <section class="cta-section" id="contact">
+    <div class="cta-inner reveal">
+      <div class="section-label">Get in Touch</div>
+      <h2 class="section-title">Ready to<br>make <em style="color: var(--amber); font-style: italic;">something</em>?</h2>
+      <p class="cta-desc">
+        Whether you have a finished song that needs mixing, a melody that needs production,
+        or just an idea that needs a studio — let's talk.
+      </p>
+      <div class="cta-buttons">
+        <a href="mailto:hello@ais-studios.com" class="btn-primary">
+          Get Started
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+        </a>
+        <a href="https://instagram.com/ais.studios" target="_blank" rel="noopener" class="btn-secondary">Instagram</a>
+      </div>
+      <p class="cta-email">or email directly at <a href="mailto:hello@ais-studios.com">hello@ais-studios.com</a></p>
+    </div>
+  </section>
+
+  <!-- ═══ FOOTER ═══ -->
+  <footer>
+    <div class="footer-left">&copy; 2026 AIS Studios. All rights reserved.</div>
+    <div class="footer-right">
+      <a href="https://instagram.com/ais.studios" target="_blank" rel="noopener">Instagram</a>
+      <a href="https://youtube.com/@aisstudios" target="_blank" rel="noopener">YouTube</a>
+      <a href="mailto:hello@ais-studios.com">Email</a>
+    </div>
+  </footer>
+
+  <!-- ═══ SCRIPTS ═══ -->
+  <script>
+    // Generate equalizer bars
+    const eqBars = document.getElementById('eqBars');
+    for (let i = 0; i < 40; i++) {
+      const bar = document.createElement('div');
+      bar.className = 'eq-bar';
+      const h = 15 + Math.random() * 65;
+      bar.style.height = h + 'px';
+      bar.style.animationDelay = (Math.random() * 1.5) + 's';
+      bar.style.animationDuration = (0.8 + Math.random() * 0.8) + 's';
+      eqBars.appendChild(bar);
+    }
+
+    // Scroll reveal
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('visible');
+        }
+      });
+    }, { threshold: 0.15, rootMargin: '0px 0px -50px 0px' });
+
+    document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+
+    // Nav scroll behavior
+    const nav = document.getElementById('nav');
+    window.addEventListener('scroll', () => {
+      nav.classList.toggle('scrolled', window.scrollY > 50);
+    });
+  </script>
+
+</body>
+</html>
